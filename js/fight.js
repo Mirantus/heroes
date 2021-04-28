@@ -1,8 +1,5 @@
 import { log, wait } from './common.js';
 
-//const ATTACKER = 'attacker';
-//const DEFENDER = 'defender';
-
 const state = {
   attacker: null,
   defender: null,
@@ -32,8 +29,6 @@ const hit = (hero, enemyPack) => {
   enemyPack.defendHero = index;
   const enemyHero = enemyPack[index];
 
-  showScene();
-
   const diff = enemyHero.power - hero.power;
 
   if (diff > 0) {
@@ -47,8 +42,6 @@ const hit = (hero, enemyPack) => {
 const nextTurn = async () => {
   const attacker = state.current === state.attacker ? state.attacker : state.defender;
   const defender = state.current === state.attacker ? state.defender : state.attacker;
-
-  await showScene();
 
   if (!isHeroAlive(attacker.pack[attacker.currentHero])) {
     attacker.currentHero = getNextHeroIndex(attacker.pack, attacker.currentHero);
@@ -67,7 +60,9 @@ const nextTurn = async () => {
   attacker.currentHero = getNextHeroIndex(attacker.pack, attacker.currentHero);
 
   state.current = state.current === attacker ? defender : attacker;
-
+  
+  await wait(1);
+  
   return nextTurn();
 };
 
@@ -91,12 +86,12 @@ const renderPack = (pack, currentHero) => {
   return heroes.join('');
 };
 
-const showScene = async () => {
+const showScene = () => {
   document.getElementById('attacker').innerHTML = renderPack(state.attacker.pack, state.attacker.currentHero, state.attacker.defendHero);
 
   document.getElementById('defender').innerHTML = renderPack(state.defender.pack, state.defender.currentHero, state.defender.defendHero);
 
-  await wait(1);
+  requestAnimationFrame(showScene);
 };
 
 const fight = async (attacker, defender) => {
@@ -105,6 +100,8 @@ const fight = async (attacker, defender) => {
   state.current = attacker;
 
   attacker.currentHero = defender.currentHero = 0;
+
+  requestAnimationFrame(showScene);
 
   return nextTurn();
 };
