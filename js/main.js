@@ -1,5 +1,5 @@
 import {log} from './common.js';
-import fight from './fight.js';
+import fight from './fight/index.js';
 
 const gamers = [
   {

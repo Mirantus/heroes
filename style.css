@@ -1,6 +1,6 @@
 #arena {
-  display: flex;
-  justify-content: space-between;
+  background: #fff;
+  width: 100%;
 }
 
 i {
