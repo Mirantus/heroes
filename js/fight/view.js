@@ -1,60 +1,83 @@
-import { size, padding, heroStates } from './constants.js';
+import { heroStates, top, heroWidth, heroHeight, heroStatusTop, heroStatusWidth, heroStatusHeight, heroShadowWidth } from './constants.js';
 
 let canvas, ctx, state;
-const width = size + padding;
+
+const renderHeroImage = (hero) => {
+  const image = new Image(heroWidth, heroHeight);
+
+  const imageName = (hero.state || 'hero') + (hero.flip ? '_r' : '');
+  image.src = `img/${imageName}.png`;
+
+  ctx.drawImage(image, hero.x, top, heroWidth, heroHeight);
+}
+
+const renderHeroStatus = (hero) => {
+  ctx.fillStyle = "green";
+
+  const heroStatusLeft = hero.flip ?
+    hero.x + heroWidth / 1.6 :
+    hero.x + heroWidth / 3.2;
+
+  ctx.fillRect(heroStatusLeft, heroStatusTop, heroStatusWidth / 5 * hero.power, heroStatusHeight);
+  ctx.strokeRect(heroStatusLeft, heroStatusTop, heroStatusWidth, heroStatusHeight);
+}
 
 const renderHero = (hero) => {
   if (hero.state === heroStates.dead) {
     return;
   }
 
-  const top = 10;
-  const textSize = 10;
-  const textLeft = hero.x + size / 2;
-  const textTop = top + 15;
-
-  ctx.strokeStyle = "black";
-
-  if (hero.state === heroStates.attack) {
-    ctx.strokeStyle = "green";
-  }
-  if (hero.state === heroStates.hurt) {
-    ctx.strokeStyle = "red";
-  }
-
-  ctx.strokeRect(hero.x, top, size, size);
-
-  ctx.font = textSize + 'px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText(hero.power, textLeft, textTop);
+  renderHeroImage(hero);
+  renderHeroStatus(hero);
 };
+
+const getSortedPack = (pack) => {
+  const sorted = [...pack].reverse();
+  const currentHeroIndex = sorted.findIndex(hero => hero.state === heroStates.attack);
+
+  if (currentHeroIndex > -1) {
+    const [currentHero] = sorted.splice(currentHeroIndex, 1);
+    sorted.push(currentHero);
+  }
+
+  return sorted;
+}
 
 const render = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  state.attacker.pack.forEach(renderHero);
-  state.defender.pack.forEach(renderHero);
+  getSortedPack(state.attacker.pack).forEach(renderHero);
+  getSortedPack(state.defender.pack).forEach(renderHero);
 
   requestAnimationFrame(render);
 };
 
-const init = (initState) => {
-    state = initState;
-    canvas = document.getElementById("arena");
-    ctx = canvas.getContext("2d");
-    
-    const attackerPack = state.attacker.pack.map((hero, index) => ({ ...hero, x: (4 - index) * width }));
+const init = (initialState) => {
+  state = initialState;
+  canvas = document.getElementById("arena");
+  ctx = canvas.getContext("2d");
+  const getHeroShift = (index, pack) => (pack.length - 1 - index) * heroShadowWidth;
 
-  const defenderPack = state.defender.pack.map((hero, index) => ({ ...hero, x: canvas.width - (5 - index) * width + padding }));
+  const attackerPack = state.attacker.pack.map((hero, index, pack) => ({
+    ...hero,
+    x: getHeroShift(index, pack)
+  }));
+
+  const defenderPack = state.defender.pack.map((hero, index, pack) => ({
+    ...hero,
+    flip: true,
+    x: canvas.width - heroWidth - getHeroShift(index, pack)
+  }));
 
   state.setPack(state.attacker, attackerPack);
   state.setPack(state.defender, defenderPack);
 };
 
 const run = () => {
-    requestAnimationFrame(render);
+  requestAnimationFrame(render);
 };
 
 export default {
-  init, run
+  init,
+  run
 };
