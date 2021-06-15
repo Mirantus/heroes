@@ -11,9 +11,10 @@ const nextTurn = async () => {
   const heroForDefend = state.getHeroForDefend();
 
   state.setHeroState(heroForAttack, heroStates.attack);
-  await wait(1);
+  await view.showHeroState(heroForAttack, heroStates.attack);
+  
   state.setHeroState(heroForDefend, heroStates.hurt);
-  await wait(1);
+  await view.showHeroState(heroForDefend, heroStates.hurt);
 
   state.hit(heroForAttack, heroForDefend);
 
@@ -35,7 +36,7 @@ const nextTurn = async () => {
 
 const fight = async (attacker, defender) => {
   state.init(attacker, defender);
-  view.init(state);
+  await view.init(state);
   view.run(state);
 
   return nextTurn();

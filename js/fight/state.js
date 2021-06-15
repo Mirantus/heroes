@@ -49,6 +49,7 @@ const state = {
   setHeroState(hero, state) {
     if (hero.state !== heroStates.dead) {
       hero.state = state;
+      hero.frame = null;
     }
   },
   setHeroPosition(hero, position) {
