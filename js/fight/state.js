@@ -13,6 +13,15 @@ const state = {
       ...defender,
       currentHero: 0
     };
+
+    this.attacker.pack.forEach(
+      hero => hero.health = 5
+    );
+
+    this.defender.pack.forEach(
+      hero => hero.health = 5
+    );
+
     this.current = this.attacker;
   },
   getCurrentAttacker() {
@@ -37,12 +46,12 @@ const state = {
     return this.getCurrentDefender().pack.find(this.isHeroAlive);
   },
   hit(hero, enemyHero) {
-    const diff = enemyHero.power - hero.power;
+    const diff = enemyHero.health - hero.power;
 
     if (diff > 0) {
-      enemyHero.power = diff;
+      enemyHero.health = diff;
     } else {
-      enemyHero.power = 0;
+      enemyHero.health = 0;
       enemyHero.state = heroStates.dead;
     }
   },
@@ -72,9 +81,9 @@ const state = {
     if (this.isPackEmpty(gamer.pack)) return null;
 
     const heroIndex = gamer.pack.findIndex(packHero => packHero === hero);
-    
+
     const nextIndex = this.increaseIndex(heroIndex);
-    
+
     const nextHero = gamer.pack[nextIndex];
 
     if (this.isHeroAlive(nextHero)) {

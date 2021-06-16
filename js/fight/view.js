@@ -31,7 +31,7 @@ const renderHeroStatus = (hero) => {
     hero.x + heroWidth / 1.6 :
     hero.x + heroWidth / 3.2;
 
-  ctx.fillRect(heroStatusLeft, heroStatusTop, heroStatusWidth / 5 * hero.power, heroStatusHeight);
+  ctx.fillRect(heroStatusLeft, heroStatusTop, heroStatusWidth / 5 * hero.health, heroStatusHeight);
   ctx.strokeRect(heroStatusLeft, heroStatusTop, heroStatusWidth, heroStatusHeight);
 }
 
