@@ -1,25 +1,40 @@
-import { log, wait, getResources, loadImages } from '../common.js';
+import {
+  log,
+  loadImages,
+} from '../common.js';
 
-import { heroStates, top, heroWidth, heroHeight, heroStatusTop, heroStatusWidth, heroStatusHeight, heroShadowWidth, images } from './constants.js';
+import {
+  heroStates,
+  top,
+  heroWidth,
+  heroHeight,
+  heroStatusTop,
+  heroStatusWidth,
+  heroStatusHeight,
+  heroShadowWidth,
+} from './constants.js';
+
+import { heroes } from '../heroes.js';
+
+import {
+  countFrames,
+  getPackResources,
+  getHeroDirection,
+  getHeroImages,
+  sortPackForRender,
+} from './utils.js';
 
 let canvas, ctx, state;
-
-const heroName = 'knight';
 
 const renderHeroImage = (hero) => {
   const image = new Image(heroWidth, heroHeight);
 
-  const heroType = hero.flip ? 'defender' : 'attacker';
+  const direction = getHeroDirection(hero);
+  const heroImages = getHeroImages(hero);
 
-  if (hero.state) {
-    const imageName = images[heroType][heroName][hero.state][hero.frame];
-    
-    image.src = `images/${heroType}/${heroName}/${hero.state}/${imageName}`;
-  } else {
-    const imageName = images[heroType][heroName].default;
+  const imageName = heroImages[hero.state][hero.frame];
 
-    image.src = `images/${heroType}/${heroName}/default/${imageName}`;
-  }
+  image.src = `images/${direction}/${hero.id}/${hero.state}/${imageName}`;
 
   ctx.drawImage(image, hero.x, top, heroWidth, heroHeight);
 }
@@ -44,50 +59,51 @@ const renderHero = (hero) => {
   renderHeroStatus(hero);
 };
 
-const getSortedPack = (pack) => {
-  const sorted = [...pack].reverse();
-  const currentHeroIndex = sorted.findIndex(hero => hero.state === heroStates.attack);
-
-  if (currentHeroIndex > -1) {
-    const [currentHero] = sorted.splice(currentHeroIndex, 1);
-    sorted.push(currentHero);
-  }
-
-  return sorted;
-}
-
 const render = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  getSortedPack(state.attacker.pack).forEach(renderHero);
-  getSortedPack(state.defender.pack).forEach(renderHero);
+  sortPackForRender(state.attacker.pack).forEach(renderHero);
+  sortPackForRender(state.defender.pack).forEach(renderHero);
 
   requestAnimationFrame(render);
 };
 
-const init = async (initialState) => {
-  state = initialState;
-  canvas = document.getElementById("arena");
-  ctx = canvas.getContext("2d");
+const getHeroShift = (index, pack) => (pack.length - 1 - index) * heroShadowWidth;
 
-  const resources = getResources(images, 'images/');
-  await loadImages(resources);
-
-  const getHeroShift = (index, pack) => (pack.length - 1 - index) * heroShadowWidth;
-
+const initAttacker = async () => {
   const attackerPack = state.attacker.pack.map((hero, index, pack) => ({
     ...hero,
     x: getHeroShift(index, pack)
   }));
 
+  state.setPack(state.attacker, attackerPack);
+
+  return loadImages(
+    getPackResources(state.attacker.pack)
+  );
+};
+
+const initDefender = async () => {
   const defenderPack = state.defender.pack.map((hero, index, pack) => ({
     ...hero,
     flip: true,
     x: canvas.width - heroWidth - getHeroShift(index, pack)
   }));
 
-  state.setPack(state.attacker, attackerPack);
   state.setPack(state.defender, defenderPack);
+
+  return loadImages(
+    getPackResources(state.defender.pack)
+  );
+}
+
+const init = async (initialState) => {
+  state = initialState;
+  canvas = document.getElementById("arena");
+  ctx = canvas.getContext("2d");
+
+  await initAttacker();
+  await initDefender();
 };
 
 const run = () => {
@@ -96,7 +112,7 @@ const run = () => {
 
 const showHeroState = async (hero) => {
   hero.frame = 0;
-  const framesCount = images.attacker[heroName][hero.state].length;
+  const framesCount = countFrames(hero);
 
   const promise = new Promise(resolve => {
     const timerId = setInterval(() => {
@@ -105,7 +121,7 @@ const showHeroState = async (hero) => {
       } else {
         hero.frame++;
       }
-      
+
       if (hero.frame === framesCount - 2) {
         resolve();
       }

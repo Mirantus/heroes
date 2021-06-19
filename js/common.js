@@ -25,13 +25,13 @@ const loadImage = (src) => {
 
     image.src = src;
     image.onload = resolve;
-    image.onerror = reject;
+    image.onerror = () => reject('Ошибка загрузки файла ' + src);
   });
 
   return promise;
 }
 
 export const loadImages = images => {
-  const promises = images.map(loadImage);
+  const promises = [...new Set(images)].map(loadImage);
   return Promise.all(promises);
 };

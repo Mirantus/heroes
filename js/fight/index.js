@@ -1,6 +1,7 @@
 import { log, wait } from '../common.js';
 import { heroStates } from './constants.js';
 import state from './state.js';
+import { isPackEmpty } from './utils.js';
 import view from './view.js';
 
 const nextTurn = async () => {
@@ -19,12 +20,12 @@ const nextTurn = async () => {
   state.hit(heroForAttack, heroForDefend);
 
   // check winner
-  if (state.isPackEmpty(defender.pack)) {
+  if (isPackEmpty(defender.pack)) {
     return attacker;
   }
 
-  state.setHeroState(heroForAttack, null);
-  state.setHeroState(heroForDefend, null);
+  state.setHeroState(heroForAttack, heroStates.idle);
+  state.setHeroState(heroForDefend, heroStates.idle);
 
   await wait(1);
 

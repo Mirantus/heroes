@@ -1,26 +1,25 @@
 import { heroStates } from './constants.js';
+import { isHeroAlive, isPackEmpty } from './utils.js';
 
 const state = {
   attacker: null,
   defender: null,
   current: null,
   init(attacker, defender) {
+    const setStateIdle = hero => this.setHeroState(hero, heroStates.idle);
+    
+    attacker.pack.forEach(setStateIdle);
+    defender.pack.forEach(setStateIdle);
+
     this.attacker = {
       ...attacker,
       currentHero: 0
     };
+    
     this.defender = {
       ...defender,
       currentHero: 0
     };
-
-    this.attacker.pack.forEach(
-      hero => hero.health = 5
-    );
-
-    this.defender.pack.forEach(
-      hero => hero.health = 5
-    );
 
     this.current = this.attacker;
   },
@@ -36,14 +35,14 @@ const state = {
   getHeroForAttack() {
     const attacker = this.getCurrentAttacker();
 
-    if (!this.isHeroAlive(attacker.currentHero)) {
+    if (!isHeroAlive(attacker.currentHero)) {
       attacker.currentHero = this.getNextHero(attacker, attacker.currentHero);
     }
 
     return attacker.currentHero;
   },
   getHeroForDefend() {
-    return this.getCurrentDefender().pack.find(this.isHeroAlive);
+    return this.getCurrentDefender().pack.find(isHeroAlive);
   },
   hit(hero, enemyHero) {
     const diff = enemyHero.health - hero.power;
@@ -58,7 +57,7 @@ const state = {
   setHeroState(hero, state) {
     if (hero.state !== heroStates.dead) {
       hero.state = state;
-      hero.frame = null;
+      hero.frame = 0;
     }
   },
   setHeroPosition(hero, position) {
@@ -71,14 +70,10 @@ const state = {
     this.current = this.current === this.attacker ? this.defender : this.attacker;
 
   },
-  isHeroAlive(hero) { return hero && hero.state !== heroStates.dead; },
-
-  isPackEmpty(pack) { return !pack.some(this.isHeroAlive); },
-
   increaseIndex(index) { return index === 4 ? 0 : index + 1; },
 
   getNextHero(gamer, hero) {
-    if (this.isPackEmpty(gamer.pack)) return null;
+    if (isPackEmpty(gamer.pack)) return null;
 
     const heroIndex = gamer.pack.findIndex(packHero => packHero === hero);
 
@@ -86,7 +81,7 @@ const state = {
 
     const nextHero = gamer.pack[nextIndex];
 
-    if (this.isHeroAlive(nextHero)) {
+    if (isHeroAlive(nextHero)) {
       return nextHero;
     };
 
