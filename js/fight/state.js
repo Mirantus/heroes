@@ -7,7 +7,7 @@ const state = {
   current: null,
   init(attacker, defender) {
     const setStateIdle = hero => this.setHeroState(hero, heroStates.idle);
-    
+
     attacker.pack.forEach(setStateIdle);
     defender.pack.forEach(setStateIdle);
 
@@ -15,7 +15,7 @@ const state = {
       ...attacker,
       currentHero: 0
     };
-    
+
     this.defender = {
       ...defender,
       currentHero: 0
@@ -70,14 +70,13 @@ const state = {
     this.current = this.current === this.attacker ? this.defender : this.attacker;
 
   },
-  increaseIndex(index) { return index === 4 ? 0 : index + 1; },
 
   getNextHero(gamer, hero) {
     if (isPackEmpty(gamer.pack)) return null;
 
     const heroIndex = gamer.pack.findIndex(packHero => packHero === hero);
 
-    const nextIndex = this.increaseIndex(heroIndex);
+    const nextIndex = heroIndex === gamer.pack.length ? 0 : heroIndex + 1;
 
     const nextHero = gamer.pack[nextIndex];
 

@@ -45,8 +45,10 @@ const renderHeroStatus = (hero) => {
   const heroStatusLeft = hero.flip ?
     hero.x + heroWidth / 1.6 :
     hero.x + heroWidth / 3.2;
+    
+  const healthPart = hero.health / heroes[hero.id].params.health;
 
-  ctx.fillRect(heroStatusLeft, heroStatusTop, heroStatusWidth / 5 * hero.health, heroStatusHeight);
+  ctx.fillRect(heroStatusLeft, heroStatusTop, heroStatusWidth * healthPart, heroStatusHeight);
   ctx.strokeRect(heroStatusLeft, heroStatusTop, heroStatusWidth, heroStatusHeight);
 }
 

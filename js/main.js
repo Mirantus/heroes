@@ -7,20 +7,17 @@ const { knight } = heroes;
 const gamers = [
   {
     pack: [
+      { ...knight.params, health: 2 },
       { ...knight.params },
-      { ...knight.params },
-      { ...knight.params },
-      { ...knight.params },
-      { ...knight.params },
+      { ...knight.params,  health: 2 },
     ],
     user: "User 1"
   }, {
     pack: [
       { ...knight.params },
+      { ...knight.params,  health: 2 },
       { ...knight.params },
-      { ...knight.params },
-      { ...knight.params },
-      { ...knight.params },
+      { ...knight.params,  health: 2 },
 
     ],
     user: "User 2"
