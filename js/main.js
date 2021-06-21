@@ -2,22 +2,23 @@ import { log } from './common.js';
 import fight from './fight/index.js';
 import { heroes } from './heroes.js';
 
-const { knight } = heroes;
+const { knight, mage } = heroes;
 
 const gamers = [
   {
     pack: [
-      { ...knight.params, health: 2 },
       { ...knight.params },
-      { ...knight.params,  health: 2 },
+      { ...mage.params },
+      { ...knight.params },
+      { ...mage.params },
     ],
     user: "User 1"
   }, {
     pack: [
+      { ...mage.params },
       { ...knight.params },
-      { ...knight.params,  health: 2 },
+      { ...mage.params },
       { ...knight.params },
-      { ...knight.params,  health: 2 },
 
     ],
     user: "User 2"
