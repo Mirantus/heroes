@@ -33,13 +33,15 @@ const renderHeroImage = (hero) => {
   const heroImages = getHeroImages(hero);
 
   const imageName = heroImages[hero.state][hero.frame];
-
+  
   image.src = `images/${direction}/${hero.id}/${hero.state}/${imageName}`;
 
   ctx.drawImage(image, hero.x, top, heroWidth, heroHeight);
 }
 
 const renderHeroStatus = (hero) => {
+  if (!hero.health) return;
+  
   ctx.fillStyle = "green";
 
   const heroStatusLeft = hero.flip ?
@@ -49,6 +51,7 @@ const renderHeroStatus = (hero) => {
   const healthPart = hero.health / heroes[hero.id].params.health;
 
   ctx.fillRect(heroStatusLeft, heroStatusTop, heroStatusWidth * healthPart, heroStatusHeight);
+  
   ctx.strokeRect(heroStatusLeft, heroStatusTop, heroStatusWidth, heroStatusHeight);
 }
 
@@ -65,6 +68,7 @@ const render = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   sortPackForRender(state.attacker.pack).forEach(renderHero);
+  
   sortPackForRender(state.defender.pack).forEach(renderHero);
 
   requestAnimationFrame(render);
@@ -120,12 +124,9 @@ const showHeroState = async (hero) => {
     const timerId = setInterval(() => {
       if (hero.frame === framesCount - 1) {
         clearInterval(timerId);
+        resolve();
       } else {
         hero.frame++;
-      }
-
-      if (hero.frame === framesCount - 2) {
-        resolve();
       }
     }, 100);
   });

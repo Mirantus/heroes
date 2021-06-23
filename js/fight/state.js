@@ -44,21 +44,9 @@ const state = {
   getHeroForDefend() {
     return this.getCurrentDefender().pack.find(isHeroAlive);
   },
-  hit(hero, enemyHero) {
-    const diff = enemyHero.health - hero.power;
-
-    if (diff > 0) {
-      enemyHero.health = diff;
-    } else {
-      enemyHero.health = 0;
-      enemyHero.state = heroStates.dead;
-    }
-  },
   setHeroState(hero, state) {
-    if (hero.state !== heroStates.dead) {
-      hero.state = state;
-      hero.frame = 0;
-    }
+    hero.state = state;
+    hero.frame = 0;
   },
   setHeroPosition(hero, position) {
     hero.x = position;
@@ -70,7 +58,6 @@ const state = {
     this.current = this.current === this.attacker ? this.defender : this.attacker;
 
   },
-
   getNextHero(gamer, hero) {
     if (isPackEmpty(gamer.pack)) return null;
 

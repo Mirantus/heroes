@@ -11,21 +11,35 @@ const nextTurn = async () => {
   const heroForAttack = state.getHeroForAttack();
   const heroForDefend = state.getHeroForDefend();
 
+ //attack
   state.setHeroState(heroForAttack, heroStates.attack);
   await view.showHeroState(heroForAttack, heroStates.attack);
-  
-  state.setHeroState(heroForDefend, heroStates.hurt);
-  await view.showHeroState(heroForDefend, heroStates.hurt);
 
-  state.hit(heroForAttack, heroForDefend);
+  const diff = heroForDefend.health - heroForAttack.power;
+  
+  if (diff > 0) {
+    heroForDefend.health = diff;
+
+    state.setHeroState(heroForDefend, heroStates.hurt);
+
+    await view.showHeroState(heroForDefend, heroStates.hurt);
+
+    state.setHeroState(heroForDefend, heroStates.idle);
+  } else {
+    heroForDefend.health = 0;
+    heroForDefend.state = heroStates.death;
+
+    await view.showHeroState(heroForDefend, heroStates.death);
+
+    state.setHeroState(heroForDefend, heroStates.dead);
+  }
+
+  state.setHeroState(heroForAttack, heroStates.idle);
 
   // check winner
   if (isPackEmpty(defender.pack)) {
     return attacker;
   }
-
-  state.setHeroState(heroForAttack, heroStates.idle);
-  state.setHeroState(heroForDefend, heroStates.idle);
 
   await wait(1);
 

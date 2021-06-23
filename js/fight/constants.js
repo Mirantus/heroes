@@ -1,6 +1,7 @@
 export const heroStates = {
   attack: 'attack',
   dead: 'dead',
+  death: 'death',
   hurt: 'hurt',
   idle: 'idle',
 };
