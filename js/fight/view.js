@@ -1,6 +1,6 @@
 import {
   log,
-  loadImages,
+  loadImage,
 } from '../common.js';
 
 import {
@@ -18,7 +18,6 @@ import { heroes } from '../heroes.js';
 
 import {
   countFrames,
-  getPackResources,
   getHeroDirection,
   getHeroImages,
   sortPackForRender,
@@ -26,32 +25,32 @@ import {
 
 let canvas, ctx, state;
 
+const fightImages = {
+  attacker: {},
+  defender: {},
+};
+
 const renderHeroImage = (hero) => {
-  const image = new Image(heroWidth, heroHeight);
-
   const direction = getHeroDirection(hero);
-  const heroImages = getHeroImages(hero);
-
-  const imageName = heroImages[hero.state][hero.frame];
   
-  image.src = `images/${direction}/${hero.id}/${hero.state}/${imageName}`;
+  const image = fightImages[direction][hero.id][hero.state][hero.frame];
 
   ctx.drawImage(image, hero.x, top, heroWidth, heroHeight);
 }
 
 const renderHeroStatus = (hero) => {
   if (!hero.health) return;
-  
+
   ctx.fillStyle = "green";
 
   const heroStatusLeft = hero.flip ?
     hero.x + heroWidth / 1.6 :
     hero.x + heroWidth / 3.2;
-    
+
   const healthPart = hero.health / heroes[hero.id].params.health;
 
   ctx.fillRect(heroStatusLeft, heroStatusTop, heroStatusWidth * healthPart, heroStatusHeight);
-  
+
   ctx.strokeRect(heroStatusLeft, heroStatusTop, heroStatusWidth, heroStatusHeight);
 }
 
@@ -68,13 +67,44 @@ const render = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   sortPackForRender(state.attacker.pack).forEach(renderHero);
-  
+
   sortPackForRender(state.defender.pack).forEach(renderHero);
 
   requestAnimationFrame(render);
 };
 
 const getHeroShift = (index, pack) => (pack.length - 1 - index) * heroShadowWidth;
+
+const loadPackImages = async (pack) => {
+  const promises = [];
+
+  pack.forEach(hero => {
+    const direction = getHeroDirection(hero);
+    const heroImages = getHeroImages(hero);
+
+    if (fightImages[direction][hero.id]) {
+      return;
+    }
+    
+    fightImages[direction][hero.id] = {};
+
+    Object.keys(heroImages).forEach(heroState => {
+      fightImages[direction][hero.id][heroState] = fightImages[direction][hero.id][heroState] || [];
+
+      heroImages[heroState].forEach((imageName, index) => {
+        const src = `images/${direction}/${hero.id}/${heroState}/${imageName}`;
+
+        const promise = loadImage(src).then(image => {
+          fightImages[direction][hero.id][heroState][index] = image;
+        });
+
+        promises.push(promise);
+      });
+    });
+  })
+
+  return Promise.all(promises);
+};
 
 const initAttacker = async () => {
   const attackerPack = state.attacker.pack.map((hero, index, pack) => ({
@@ -84,9 +114,7 @@ const initAttacker = async () => {
 
   state.setPack(state.attacker, attackerPack);
 
-  return loadImages(
-    getPackResources(state.attacker.pack)
-  );
+  return loadPackImages(attackerPack);
 };
 
 const initDefender = async () => {
@@ -98,9 +126,7 @@ const initDefender = async () => {
 
   state.setPack(state.defender, defenderPack);
 
-  return loadImages(
-    getPackResources(state.defender.pack)
-  );
+  return loadPackImages(defenderPack);
 }
 
 const init = async (initialState) => {
