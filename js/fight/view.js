@@ -32,7 +32,7 @@ const fightImages = {
 
 const renderHeroImage = (hero) => {
   const direction = getHeroDirection(hero);
-  
+
   const image = fightImages[direction][hero.id][hero.state][hero.frame];
 
   ctx.drawImage(image, hero.x, top, heroWidth, heroHeight);
@@ -41,7 +41,15 @@ const renderHeroImage = (hero) => {
 const renderHeroStatus = (hero) => {
   if (!hero.health) return;
 
-  ctx.fillStyle = "green";
+  const healthPercent = hero.health * 100 / heroes[hero.id].params.health;
+  
+  if (healthPercent > 66) {
+    ctx.fillStyle = "green";
+  } else if (healthPercent > 33) {
+    ctx.fillStyle = "yellow";
+  } else {
+    ctx.fillStyle = "red";
+  }
 
   const heroStatusLeft = hero.flip ?
     hero.x + heroWidth / 1.6 :
@@ -85,7 +93,7 @@ const loadPackImages = async (pack) => {
     if (fightImages[direction][hero.id]) {
       return;
     }
-    
+
     fightImages[direction][hero.id] = {};
 
     Object.keys(heroImages).forEach(heroState => {

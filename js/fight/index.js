@@ -41,7 +41,7 @@ const nextTurn = async () => {
     return attacker;
   }
 
-  await wait(1);
+  await wait(0.3);
 
   state.changeCurrentHero(attacker);
   state.changeCurrentGamer();

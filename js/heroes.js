@@ -2,8 +2,8 @@ export const heroes = {
   knight: {
     params: {
       id: 'knight',
-      health: 3,
-      power: 7,
+      health: 10,
+      power: 4,
     },
     images: {
       attack: [
@@ -39,8 +39,8 @@ export const heroes = {
   mage: {
     params: {
       id: 'mage',
-      health: 7,
-      power: 3,
+      health: 4,
+      power: 8,
     },
     images: {
       attack: [
