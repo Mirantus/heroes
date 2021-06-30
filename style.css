@@ -1,4 +1,4 @@
 #arena {
-  background: #fff;
+  background: url(images/fight-bg.png) no-repeat center/cover;
   width: 100%;
 }
