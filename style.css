@@ -4,6 +4,19 @@ body {
 }
 
 #arena {
-  background: url(images/fight-bg.png) no-repeat center/cover;
-  width: 100%;
+  background: url(images/fight-bg.png) center/cover;
+  margin: auto;
+  display: block;
+}
+
+@media (orientation: landscape) {
+  #arena {
+    height: 100vh;
+  }
+}
+
+@media (orientation: portrait) {
+  #arena {
+    width: 100%;
+  }
 }

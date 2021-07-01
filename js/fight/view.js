@@ -142,6 +142,7 @@ const init = async (initialState) => {
   canvas = document.getElementById("arena");
   ctx = canvas.getContext("2d");
 
+
   await initAttacker();
   await initDefender();
 };

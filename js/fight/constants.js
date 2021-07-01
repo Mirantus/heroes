@@ -7,8 +7,8 @@ export const heroStates = {
 };
 
 export const top = 0;
-export const heroWidth = 128;
-export const heroHeight = 128;
+export const heroWidth = 96;
+export const heroHeight = 96;
 export const heroStatusTop = top + heroHeight * 0.9;
 export const heroStatusWidth = 10;
 export const heroStatusHeight = 5;
