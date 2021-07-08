@@ -6,10 +6,13 @@ const state = {
   defender: null,
   current: null,
   init(attacker, defender) {
-    const setStateIdle = hero => this.setHeroState(hero, heroStates.idle);
+    const initHero = hero => {
+      this.setHeroState(hero, heroStates.idle);
+      hero.ultimate = 0;
+    }
 
-    attacker.pack.forEach(setStateIdle);
-    defender.pack.forEach(setStateIdle);
+    attacker.pack.forEach(initHero);
+    defender.pack.forEach(initHero);
 
     this.attacker = {
       ...attacker,
@@ -72,6 +75,16 @@ const state = {
     };
 
     return this.getNextHero(gamer, nextHero);
+  },
+  updateUltimate() {
+    const updateHeroUltimate = hero => {
+      const newUltimate = hero.ultimate + hero.ultimateSpeed;
+      
+      hero.ultimate = Math.min(newUltimate, 100);
+    };
+    
+    this.attacker.pack.forEach(updateHeroUltimate);
+    this.defender.pack.forEach(updateHeroUltimate);
   },
 };
 

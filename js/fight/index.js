@@ -53,6 +53,8 @@ const fight = async (attacker, defender) => {
   state.init(attacker, defender);
   await view.init(state);
   view.run(state);
+  
+  setInterval(() => state.updateUltimate(), 1000);
 
   return nextTurn();
 };

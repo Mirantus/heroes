@@ -4,6 +4,7 @@ export const heroes = {
       id: 'knight',
       health: 10,
       power: 4,
+      ultimateSpeed: 20
     },
     images: {
       attack: [
@@ -41,6 +42,7 @@ export const heroes = {
       id: 'mage',
       health: 4,
       power: 8,
+      ultimateSpeed: 10
     },
     images: {
       attack: [

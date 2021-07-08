@@ -12,6 +12,7 @@ import {
   heroStatusWidth,
   heroStatusHeight,
   heroShadowWidth,
+  heroUltimateTop
 } from './constants.js';
 
 import { heroes } from '../heroes.js';
@@ -38,28 +39,42 @@ const renderHeroImage = (hero) => {
   ctx.drawImage(image, hero.x, top, heroWidth, heroHeight);
 }
 
+const renderStatus = (x, y, percent, color) => {
+  ctx.fillStyle = "gray";
+
+  ctx.fillRect(x, y, heroStatusWidth, heroStatusHeight);
+
+  ctx.fillStyle = color;
+
+  ctx.fillRect(x, y, heroStatusWidth * percent / 100, heroStatusHeight);
+
+  ctx.strokeRect(x, y, heroStatusWidth, heroStatusHeight);
+}
+
 const renderHeroStatus = (hero) => {
   if (!hero.health) return;
 
-  const healthPercent = hero.health * 100 / heroes[hero.id].params.health;
-  
-  if (healthPercent > 66) {
-    ctx.fillStyle = "green";
-  } else if (healthPercent > 33) {
-    ctx.fillStyle = "yellow";
+  const percent = hero.health * 100 / heroes[hero.id].params.health;
+
+  let color;
+
+  if (percent > 66) {
+    color = "green";
+  } else if (percent > 33) {
+    color = "yellow";
   } else {
-    ctx.fillStyle = "red";
+    color = "red";
   }
 
-  const heroStatusLeft = hero.flip ?
-    hero.x + heroWidth / 1.6 :
-    hero.x + heroWidth / 3.2;
+  renderStatus(getStatusLeft(hero), heroStatusTop, percent, color);
+}
 
-  const healthPart = hero.health / heroes[hero.id].params.health;
+const renderHeroUltimate = (hero) => {
+  if (!hero.health) return;
 
-  ctx.fillRect(heroStatusLeft, heroStatusTop, heroStatusWidth * healthPart, heroStatusHeight);
+  const color = hero.ultimate === 100 ? "orange" : "blue";
 
-  ctx.strokeRect(heroStatusLeft, heroStatusTop, heroStatusWidth, heroStatusHeight);
+  renderStatus(getStatusLeft(hero), heroUltimateTop, hero.ultimate, color);
 }
 
 const renderHero = (hero) => {
@@ -68,6 +83,7 @@ const renderHero = (hero) => {
   }
 
   renderHeroImage(hero);
+  renderHeroUltimate(hero);
   renderHeroStatus(hero);
 };
 
@@ -114,6 +130,10 @@ const loadPackImages = async (pack) => {
   return Promise.all(promises);
 };
 
+const getStatusLeft = hero => hero.flip ?
+  hero.x + heroWidth / 1.6 :
+  hero.x + heroWidth / 3.2;
+
 const initAttacker = async () => {
   const attackerPack = state.attacker.pack.map((hero, index, pack) => ({
     ...hero,
@@ -145,6 +165,8 @@ const init = async (initialState) => {
 
   await initAttacker();
   await initDefender();
+
+  canvas.addEventListener('click', handleClick);
 };
 
 const run = () => {
@@ -167,6 +189,32 @@ const showHeroState = async (hero) => {
   });
 
   return promise;
+};
+
+const getHeroByCoords = (x, y) => {
+  const heroes = [...state.attacker.pack, ...state.defender.pack];
+
+  return heroes.find(hero => {
+    const left = getStatusLeft(hero);
+    const right = left + heroStatusWidth;
+
+    return x >= left && x <= right && !!hero.health
+  });
+};
+
+const handleClick = (event) => {
+  const canvasLeft = canvas.offsetLeft + canvas.clientLeft;
+  const canvasTop = canvas.offsetTop + canvas.clientTop;
+
+  const scale = canvas.offsetWidth / 300;
+
+  const x = event.clientX / scale;
+  const y = event.clientY / scale;
+
+  const hero = getHeroByCoords(x, y);
+  if (hero && hero.ultimate === 100) {
+    hero.ultimate = 0;
+  }
 };
 
 export default {

@@ -13,3 +13,4 @@ export const heroStatusTop = top + heroHeight * 0.9;
 export const heroStatusWidth = 10;
 export const heroStatusHeight = 5;
 export const heroShadowWidth = 20;
+export const heroUltimateTop = heroStatusTop + 3;
