@@ -34,7 +34,17 @@ export const heroes = {
       ],
       idle: [
         'idle.png'
-      ]
+      ],
+      ultimate: [
+        'ultimate1.png',
+        'ultimate2.png',
+        'ultimate3.png',
+        'ultimate4.png',
+        'ultimate5.png',
+        'ultimate6.png',
+        'ultimate7.png',
+        'ultimate8.png',
+        ]
     }
   },
   mage: {
@@ -74,7 +84,16 @@ export const heroes = {
         ],
       idle: [
           'idle.png'
-        ]
+        ],
+      ultimate: [
+          'ultimate0.png',
+          'ultimate1.png',
+          'ultimate2.png',
+          'ultimate3.png',
+          'ultimate4.png',
+          'ultimate5.png',
+          'ultimate6.png',
+      ]
     }
   }
 };

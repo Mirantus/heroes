@@ -13,7 +13,7 @@ export const isPackEmpty = pack => !pack.some(isHeroAlive);
 
 export const sortPackForRender = (pack) => {
   const sorted = [...pack].reverse();
-  const currentHeroIndex = sorted.findIndex(hero => hero.state === heroStates.attack);
+  const currentHeroIndex = sorted.findIndex(hero => [heroStates.attack, heroStates.ultimate].includes(hero.state));
 
   if (currentHeroIndex > -1) {
     const [currentHero] = sorted.splice(currentHeroIndex, 1);

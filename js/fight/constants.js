@@ -4,6 +4,7 @@ export const heroStates = {
   death: 'death',
   hurt: 'hurt',
   idle: 'idle',
+  ultimate: 'ultimate',
 };
 
 export const top = 0;

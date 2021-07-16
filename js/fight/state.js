@@ -5,6 +5,7 @@ const state = {
   attacker: null,
   defender: null,
   current: null,
+  heroForUltimate: null,
   init(attacker, defender) {
     const initHero = hero => {
       this.setHeroState(hero, heroStates.idle);

@@ -35,7 +35,7 @@ const renderHeroImage = (hero) => {
   const direction = getHeroDirection(hero);
 
   const image = fightImages[direction][hero.id][hero.state][hero.frame];
-
+  
   ctx.drawImage(image, hero.x, top, heroWidth, heroHeight);
 }
 
@@ -179,7 +179,11 @@ const showHeroState = async (hero) => {
 
   const promise = new Promise(resolve => {
     const timerId = setInterval(() => {
-      if (hero.frame === framesCount - 1) {
+      const isLastFrame = hero.frame === framesCount - 1;
+
+      const isStopped = state.heroForUltimate && state.heroForUltimate !== hero;
+
+      if (isLastFrame || isStopped) {
         clearInterval(timerId);
         resolve();
       } else {
@@ -207,18 +211,18 @@ const handleClick = (event) => {
   const canvasTop = canvas.offsetTop + canvas.clientTop;
 
   const scale = canvas.offsetWidth / 300;
-
-  const x = event.clientX / scale;
-  const y = event.clientY / scale;
-
+  
+  const x = (event.clientX - canvasLeft) / scale;
+  const y = (event.clientY - canvasTop) / scale;
+  
   const hero = getHeroByCoords(x, y);
   if (hero && hero.ultimate === 100) {
-    hero.ultimate = 0;
+    state.heroForUltimate = hero;
   }
 };
 
 export default {
   init,
   run,
-  showHeroState
+  showHeroState,
 };
