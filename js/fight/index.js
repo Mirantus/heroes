@@ -3,14 +3,33 @@ import { heroStates } from './constants.js';
 import state from './state.js';
 import { isPackEmpty, getHeroDirection } from './utils.js';
 import view from './view.js';
+import { heroes } from '../heroes.js';
+
 
 const ultimate = async () => {
   const { heroForUltimate } = state;
+  let attacker, defender;
 
   if (heroForUltimate) {
-    const defender = getHeroDirection(heroForUltimate) === 'attacker' ? state.defender : state.attacker;
+    if (getHeroDirection(heroForUltimate) === 'attacker') {
+      attacker = state.attacker;
+      defender = state.defender;
+    } else {
+      attacker = state.defender;
+      defender = state.attacker;
+    }
 
-    await attack(heroForUltimate, defender.pack);
+    if (heroForUltimate.id === 'knight') {
+      await attack(heroForUltimate, defender.pack);
+    }
+
+    if (heroForUltimate.id === 'mage') {
+      await freeze(heroForUltimate, defender.pack);
+    }
+
+    if (heroForUltimate.id === 'rogue') {
+      await heal(heroForUltimate, attacker.pack);
+    }
 
     heroForUltimate.ultimate = 0;
     state.heroForUltimate = null;
@@ -19,20 +38,19 @@ const ultimate = async () => {
   }
 };
 
-const attack = async (heroForAttack, heroesForDefend) => {
-
-  if (state.heroForUltimate === heroForAttack) {
-    state.setHeroState(heroForAttack, heroStates.ultimate);
+const attack = async (hero, defenderPack) => {
+  if (state.heroForUltimate === hero) {
+    state.setHeroState(hero, heroStates.ultimate);
   } else {
-    state.setHeroState(heroForAttack, heroStates.attack);
+    state.setHeroState(hero, heroStates.attack);
   }
 
-  await view.showHeroState(heroForAttack);
+  await view.showHeroState(hero);
 
   const attackHero = async (heroForDefend) => {
     const power = state.heroForUltimate ?
-      heroForAttack.power / 2 :
-      heroForAttack.power;
+      hero.power / 2 :
+      hero.power;
 
     const diff = heroForDefend.health - power;
 
@@ -54,9 +72,41 @@ const attack = async (heroForAttack, heroesForDefend) => {
     }
   };
 
-  await Promise.all(heroesForDefend.map(attackHero));
+  await Promise.all(defenderPack.map(attackHero));
 
-  state.setHeroState(heroForAttack, heroStates.idle);
+  state.setHeroState(hero, heroStates.idle);
+};
+
+const freeze = async (hero, defenderPack) => {
+  state.setHeroState(hero, heroStates.ultimate);
+
+  await view.showHeroState(hero);
+
+  const freezeHero = heroForFreeze => {
+    heroForFreeze.freeze = true;
+
+    setTimeout(() => heroForFreeze.freeze = false, 5000)
+  };
+
+  defenderPack.map(freezeHero);
+
+  state.setHeroState(hero, heroStates.idle);
+};
+
+const heal = async (hero, pack) => {
+  state.setHeroState(hero, heroStates.ultimate);
+
+  await view.showHeroState(hero);
+
+  const healHero = heroForHeal => {
+    const maxHeroHealth = heroes[heroForHeal.id].params.health;
+
+    heroForHeal.health = Math.min(heroForHeal.health + maxHeroHealth / 3, maxHeroHealth);
+  };
+
+  pack.map(healHero);
+
+  state.setHeroState(hero, heroStates.idle);
 };
 
 const nextTurn = async () => {
@@ -66,9 +116,11 @@ const nextTurn = async () => {
   const heroForAttack = state.getHeroForAttack();
   const heroForDefend = state.getHeroForDefend();
 
-  await attack(heroForAttack, [heroForDefend]);
+  if (!heroForAttack.freeze) {
+    await attack(heroForAttack, [heroForDefend]);
 
-  await ultimate();
+    await ultimate();
+  }
 
   // check winner
   if (isPackEmpty(defender.pack)) {

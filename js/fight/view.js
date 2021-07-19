@@ -35,8 +35,15 @@ const renderHeroImage = (hero) => {
   const direction = getHeroDirection(hero);
 
   const image = fightImages[direction][hero.id][hero.state][hero.frame];
-  
-  ctx.drawImage(image, hero.x, top, heroWidth, heroHeight);
+
+  if (hero.freeze) {
+    ctx.save();
+    ctx.globalAlpha = 0.4;
+    ctx.drawImage(image, hero.x, top, heroWidth, heroHeight);
+    ctx.restore()
+  } else {
+    ctx.drawImage(image, hero.x, top, heroWidth, heroHeight);
+  }
 }
 
 const renderStatus = (x, y, percent, color) => {
@@ -211,10 +218,10 @@ const handleClick = (event) => {
   const canvasTop = canvas.offsetTop + canvas.clientTop;
 
   const scale = canvas.offsetWidth / 300;
-  
+
   const x = (event.clientX - canvasLeft) / scale;
   const y = (event.clientY - canvasTop) / scale;
-  
+
   const hero = getHeroByCoords(x, y);
   if (hero && hero.ultimate === 100) {
     state.heroForUltimate = hero;
